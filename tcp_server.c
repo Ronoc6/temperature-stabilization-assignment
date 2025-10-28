@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <stdbool.h>
 #include "utils.h"
-
+#include "math.h"
 
 #define numExternals 4     // Number of external processes 
 #define EPS 1e-3
@@ -89,7 +89,7 @@ int * establishConnectionsFromExternalProcesses()
 
 
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int socket_desc; 
    // unsigned int client_size;
@@ -111,7 +111,11 @@ int main(void)
 
         // Array that stores temperatures from clients 
         float temperature[numExternals];
-	float updatedTemp = 0.0;
+	float centralTemp = (float)atof(argv[1]);
+	float prevTemp[numExternals];
+	float updatedTemp;
+	float diff = 0.0;
+
         // Receive the messages from the 4 external processes 
         for (int i = 0;  i < numExternals; i++){
 
@@ -122,6 +126,7 @@ int main(void)
             }
 
             temperature[i] = messageFromClient.T;
+	    prevTemp[i] = temperature[i];
             printf("Temperature of External Process (%d) = %f\n", i, temperature[i]);
 
         }
@@ -133,11 +138,11 @@ int main(void)
 	for (int i = 0; i < numExternals; i++){
 	    sumExternal += temperature[i];
 	}
-	updatedTemp = (2.0 * updatedTemp + sumExternal) / 6.0;
+	centralTemp = (2.0 * centralTemp + sumExternal) / 6.0;
 
         // Construct message with updated temperature
         struct msg updated_msg; 
-        updated_msg.T = updatedTemp;
+        updated_msg.T = centralTemp;
         updated_msg.Index = 0;                // Index of central server 
 
 
@@ -149,6 +154,7 @@ int main(void)
             }
         }
 
+	//Recieve updated temperatures from the 4 external processes
 	for(int i = 0; i < numExternals; i++){
 	    if(recv(client_socket[i], (void *)&messageFromClient, sizeof(messageFromClient), 0) < 0){
 		printf("Couldnt receive\n");
@@ -159,10 +165,21 @@ int main(void)
 
         printf("\n");
 
+	//Checking temperature for stability
+	for (int i = 0; i <numExternals; i++){
+	    float d = fabs(temperature[i] - prevTemp[i]);
+	    if (d > diff){
+		diff = d;
+	    }
+	    prevTemp[i] = temperature[i];
+	}
+
         // Check stability condition 
-        if (updatedTemp == 0)
-            stable = true; 
-	    printf("Final Tempurature = %f\n", updatedTemp);
+        if (diff < EPS){
+	    printf("Final Tempurature = %f\n", centralTemp);
+	    updated_msg.T = -1.0;
+	    stable = true;
+	}
     }
  
     // Closing all sockets
