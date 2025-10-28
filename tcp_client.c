@@ -18,7 +18,7 @@ int main (int argc, char *argv[])
     
     // Command-line input arguments (user provided)
     int externalIndex = atoi(argv[1]); 
-    double initialTemperature = atof(argv[2]); 
+    float initialTemperature = atof(argv[2]); 
 
     
     // Create socket:
@@ -44,36 +44,49 @@ int main (int argc, char *argv[])
     }
     printf("Connected with server successfully\n");
     printf("--------------------------------------------------------\n\n");
-       
-    // Package to the sent to server 
-    the_message = prepare_message(externalIndex, initialTemperature); 
-	
-    // Send the message to server:
-    if(send(socket_desc, (const void *)&the_message, sizeof(the_message), 0) < 0){
-        printf("Unable to send message\n");
-        return -1;
-    }
- 
+
+    float centralTemp;
+
     while(1){
-    // Receive the server's response:
+
+        // Package to the sent to server 
+        the_message = prepare_message(externalIndex, initialTemperature); 
+	
+        // Send the message to server:
+        if(send(socket_desc, (const void *)&the_message, sizeof(the_message), 0) < 0){
+            printf("Unable to send message\n");
+            return -1;
+        }
+ 
+
+        // Receive the server's response:
         if(recv(socket_desc, (void *)&the_message, sizeof(the_message), 0) < 0){
             printf("Error while receiving server's msg\n");
             return -1;
         }
-	if (the_message.Done == 2){
 
-            double centralTemp = the_message.T;
-            initialTemperature = (3.0 * initialTemperature + 2.0 * centralTemp) / 5.0;
+        if (the_message.T == -1.0){
 
-            printf("--------------------------------------------------------\n");
-            printf("Updated temperature sent by the Central process = %f\n", the_message.T);
+            //float centralTemp = the_message.T;
+            //initialTemperature = (3.0 * initialTemperature + 2.0 * centralTemp) / 5.0;
+
+            //printf("--------------------------------------------------------\n");
+            //printf("Updated temperature sent by the Central process = %f\n", the_message.T);
+
+	    char ack[] = "ACK";
 	    printf("DONE\n");
+	    send(socket_desc, ack, sizeof(ack), 0);
+	    break;
 
-	    the_message = prepare_message(externalIndex, initialTemperature);
+ 	    //the_message = prepare_message(externalIndex, initialTemperature);
 
-	}
+        }
+
+        initialTemperature = (3.0 * initialTemperature + 2.0 * centralTemp)/5.0;
+
         printf("--------------------------------------------------------\n");
         printf("Updated temperature sent by the Central process = %f\n", the_message.T);
+
     }
     // Close the socket:
     close(socket_desc);

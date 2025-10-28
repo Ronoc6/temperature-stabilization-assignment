@@ -10,7 +10,7 @@
 
 
 #define numExternals 4     // Number of external processes 
-
+#define EPS 1e-3
 
 int * establishConnectionsFromExternalProcesses()
 {
@@ -103,14 +103,15 @@ int main(void)
     // an array of file descriptors of client sockets. 
     int * client_socket = establishConnectionsFromExternalProcesses(); 
 
-
+    //float temp[numExternals];
+    //float prevTemp[numExternals];
 
     int stable = false;
     while ( !stable ){
 
         // Array that stores temperatures from clients 
         float temperature[numExternals];
-
+	float updatedTemp = 0.0;
         // Receive the messages from the 4 external processes 
         for (int i = 0;  i < numExternals; i++){
 
@@ -126,9 +127,13 @@ int main(void)
         }
 
         // Modify Temperature 
-        double updatedTemp = temperature[0] + temperature[1] + temperature[2] + temperature[3];
-        updatedTemp += updatedTemp / 4.0;  
-
+        //float updatedTemp = temperature[0] + temperature[1] + temperature[2] + temperature[3];
+        //updatedTemp += updatedTemp / 4.0;  
+	float sumExternal = 0.0;
+	for (int i = 0; i < numExternals; i++){
+	    sumExternal += temperature[i];
+	}
+	updatedTemp - (2.0 * updatedTemp + sumExternal) / 6.0;
 
         // Construct message with updated temperature
         struct msg updated_msg; 
@@ -142,14 +147,22 @@ int main(void)
                 printf("Can't send\n");
                 return -1;
             }
-        }        
+        }
+
+	for(int i = 0; i < numExternals; i++){
+	    if(recv(client_socket[i], (void *)&messageFromClient, sizeof(messageFromClient), 0) < 0){
+		printf("Couldnt receive\n");
+		return -1;
+	    }
+	    temperature[i] = messageFromClient.T;
+	}
 
         printf("\n");
 
         // Check stability condition 
         if (updatedTemp == 0)
             stable = true; 
-
+	    printf("Final Tempurature = %f\n", updatedTemp);
     }
  
     // Closing all sockets

@@ -8,13 +8,12 @@
 #include "utils.h"
 
 
-struct msg prepare_message(int i_Index, double i_Temperature)
+struct msg prepare_message(int i_Index, float i_Temperature)
 {
     struct msg message; 
 
     message.Index = i_Index; 
     message.T = i_Temperature;
-    message.Done = 1;
 
     return message;
 }
