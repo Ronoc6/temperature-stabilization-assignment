@@ -126,7 +126,7 @@ int main(void)
         }
 
         // Modify Temperature 
-        float updatedTemp = temperature[0] + temperature[1] + temperature[2] + temperature[3];
+        double updatedTemp = temperature[0] + temperature[1] + temperature[2] + temperature[3];
         updatedTemp += updatedTemp / 4.0;  
 
 
