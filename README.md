@@ -147,11 +147,11 @@ Open four terminals and in each one run:
 The book is written is a very conversational style that is both enjoyable and accessible. I think you will enjoy reading it. Give it a try if you have time. If you want just to learn about serialization in network communication then read the Section **7.5 Serialization—How to Pack Data** (https://beej.us/guide/bgnet/html/split-wide/slightly-advanced-techniques.html#serialization). 
 
 
-![Server]("C:\Users\conor\CSE4001\Server.png")
-![Client 1]("C:\Users\conor\CSE4001\Client_1.png")
-![Client 2]("C:\Users\conor\CSE4001\Client_2.png")
-![Client 3]("C:\Users\conor\CSE4001\Client_3.png")
-![Client 4]("C:\Users\conor\CSE4001\Client_4.png")
+![Server](C:\Users\conor\CSE4001\Server.png)
+![Client 1](C:\Users\conor\CSE4001\Client_1.png)
+![Client 2](C:\Users\conor\CSE4001\Client_2.png)
+![Client 3](C:\Users\conor\CSE4001\Client_3.png)
+![Client 4](C:\Users\conor\CSE4001\Client_4.png)
 
 Assignment Description:
 Once the files are compiled, the main terminal in the container will be set as the "server". Once the server is established, 4 clients will then be activated in the container on seperate terminals. Once a connection between the clients and server is established, the clients will then begin to transmit their tempuratures to the server. The server will then calculate the tempuratures until it has a reached a median state. This will then terminate all of the connections print the final temperature.
