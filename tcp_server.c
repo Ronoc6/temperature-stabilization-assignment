@@ -133,7 +133,7 @@ int main(void)
 	for (int i = 0; i < numExternals; i++){
 	    sumExternal += temperature[i];
 	}
-	updatedTemp - (2.0 * updatedTemp + sumExternal) / 6.0;
+	updatedTemp = (2.0 * updatedTemp + sumExternal) / 6.0;
 
         // Construct message with updated temperature
         struct msg updated_msg; 
